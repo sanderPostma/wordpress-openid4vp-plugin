@@ -14,18 +14,56 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// store the correlation id in the SESSION
-$presentationResponse = $_SESSION['presentationResponse'];
-$jsonAttributeNames = explode(".", $attributes['attributeName']);
+// Retrieve the presentation response
+$presentationResponse = isset($_SESSION['presentationResponse']) ? $_SESSION['presentationResponse'] : null;
+$presentationStatusUri = isset($_SESSION['presentationStatusUri']) ? $_SESSION['presentationStatusUri'] : null;
+if (empty($presentationResponse) && !empty($presentationStatusUri)) {
+    $headers = array('Content-Type' => 'application/json');
+    if (isset($_SESSION['authenticationHeaderName']) && isset($_SESSION['authenticationToken'])) {
+        $headers[$_SESSION['authenticationHeaderName']] = $_SESSION['authenticationToken'];
+    }
 
-$result = $presentationResponse[$attributes['credentialType']];
-foreach ($jsonAttributeNames as &$name) {
-    $result = $result[$name];
+    $response = wp_remote_get( $presentationStatusUri, array(
+        'headers' => $headers,
+        'timeout'     => 45,
+        'redirection' => 5,
+        'blocking'    => true
+    ));
+
+    $body = wp_remote_retrieve_body($response);
+    //$result = json_decode( $body );
+    $successUrl = null;
+    if ( json_decode( $body ) != null ) {
+        $presentationResponse = json_decode( $body, true);
+        $_SESSION['presentationResponse'] = $presentationResponse;
+
+        $_SESSION['authenticationHeaderName'] = null;
+        $_SESSION['authenticationToken'] = null;
+        $_SESSION['successUrl'] = null;
+    }
 }
-// $arr is now array(2, 4, 6, 8)
-unset($name);
 
-$block_content = '<p ' . get_block_wrapper_attributes() . '>' . $attributes['attributeLabel'] . ': ' . $result . '</p>';
+if (!empty($presentationResponse) && isset($attributes['attributeName'])) {
+    $jsonAttributeNames = explode(".", $attributes['attributeName']);
 
-echo $block_content;
+    // Check if the credential type exists in the presentation response
+    if (isset($attributes['credentialType']) && isset($presentationResponse[$attributes['credentialType']])) {
+        $result = $presentationResponse[$attributes['credentialType']];
+        foreach ($jsonAttributeNames as &$name) {
+            // Check if the attribute exists before accessing it
+            if (isset($result[$name])) {
+                $result = $result[$name];
+            } else {
+                // If the attribute doesn't exist, set result to empty and break the loop
+                $result = '';
+                break;
+            }
+        }
+        // $arr is now array(2, 4, 6, 8)
+        unset($name);
 
+        $block_content = '<p ' . get_block_wrapper_attributes() . '>' . $attributes['attributeLabel'] . ': ' . $result . '</p>';
+
+        echo $block_content;
+    }
+}

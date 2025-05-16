@@ -5,7 +5,7 @@
  * Version:           0.1.0
  * Requires at least: 6.6
  * Requires PHP:      7.2
- * Author:            The WordPress Contributors
+ * Author:            Credenco
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       openid4vp-exchange
@@ -43,7 +43,9 @@ register_activation_hook(__FILE__, [$openid4vp, 'upgrade']);
  */
 function create_block_openid4vp_block_init() {
 	register_block_type( __DIR__ . '/build/presentationExchange' );
+	register_block_type( __DIR__ . '/build/presentationExchangeOrgWallet' );
 	register_block_type( __DIR__ . '/build/presentationAttribute' );
+	register_block_type( __DIR__ . '/build/credentialIssue' );
     if(!session_id()) {
         session_start();
     }
@@ -80,6 +82,18 @@ function enqueue_my_scripts() {
     );
 }
 
+function enqueue_org_wallet_scripts() {
+    // Enqueue our script, using the jQuery dependency
+    wp_enqueue_script( 'ajax-script', OPENID4VP_PLUGIN_URL . '/build/presentationExchangeOrgWallet/submitPresentationRequest.js', array( 'jquery' ));
+    wp_localize_script(
+        'ajax-script',
+        'my_ajax_obj',
+        array(
+            'ajax_url' => admin_url( 'admin-ajax.php' ),
+        )
+    );
+}
+
 add_action( 'init', 'create_block_openid4vp_block_init' );
 // Display the Login button at the top of the WP Login form
 add_action('login_message', 'openid4vp_login_form_button');
@@ -88,6 +102,9 @@ add_action( 'wp_enqueue_script', 'enqueue_my_scripts' );
 
 add_action( 'wp_ajax_nopriv_poll_status_ajax', 'ajax_poll_status' );
 add_action( 'wp_ajax_poll_status_ajax', 'ajax_poll_status' );
+
+add_action( 'wp_ajax_nopriv_presentation_exchange_ajax', 'ajax_org_wallet_presentation_exchange');
+add_action( 'wp_ajax_presentation_exchange_ajax', 'ajax_org_wallet_presentation_exchange');
 
 /**
  * Gets the number of votes from the database, and sends it
@@ -98,13 +115,7 @@ function ajax_poll_status() {
     if ( isset( $_POST['current'] ) ) {
         $current = $_POST['current'];
     }
-    // Get the number of votes from the database
-    //$votes = get_option( 'our_votes', 0 );
     $options = new OpenID4VP_Admin_Options();
-//     if (array_key_exists('successUrl', $attributes)) {
-//         $_SESSION['successUrl'] = wp_sanitize_redirect($attributes['successUrl']);
-//     }
-
 
     $response = wp_remote_get( $_SESSION['presentationStatusUri'], array(
         'headers' => array('Content-Type' => 'application/json', $_SESSION['authenticationHeaderName'] => $_SESSION['authenticationToken'] ),
@@ -166,6 +177,44 @@ function ajax_poll_status() {
     die();
 }
 
+/**
+ * Gets the number of votes from the database, and sends it
+ * back to the client script as JSON.
+ */
+function ajax_org_wallet_presentation_exchange() {
+    // Get the 'walletUrl' data that the AJAX call sent
+    if ( isset( $_POST['walletUrl'] ) ) {
+        $walletUrl = $_POST['walletUrl'];
+    }
+    $openidEndpoint = $_SESSION['openidEndpoint'];
+    $authenticationHeaderName = $_SESSION['authenticationHeaderName'];
+    $authenticationToken = $_SESSION['authenticationToken'];
+    $presentationDefinitionId = $_SESSION['presentationDefinitionId'];
+
+   $response = wp_remote_post( $openidEndpoint . '/' . $presentationDefinitionId, array(
+       'headers' => array('Content-Type' => 'application/json', $authenticationHeaderName => $authenticationToken),
+       'timeout'     => 45,
+       'redirection' => 5,
+       'blocking'    => true,
+       'body'        => '{
+         "walletUrl": "' . $walletUrl .'",
+         "successUrl": "' . $_SESSION['successUrl'] . '"
+       }'
+   ));
+
+   if (is_wp_error($response)) {
+       return 'Error fetching data';
+   }
+
+   $body = wp_remote_retrieve_body($response);
+   $result = json_decode( $body );
+
+   $_SESSION['correlationId'] = $result->correlationId;
+   $_SESSION['presentationStatusUri'] = $result->presentationStatusUri;
+
+   echo $body;
+   die();
+}
 
 add_action( 'wp_ajax_my_tag_count', 'my_ajax_handler' );
 function my_ajax_handler() {
