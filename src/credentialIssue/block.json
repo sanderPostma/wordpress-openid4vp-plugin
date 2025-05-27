@@ -22,7 +22,13 @@
 		},
 		"credentialData": {
 			"type": "string"
-		}
+		},
+		"formData": {
+			"type": "string"
+		},
+		"sessionData": {
+			"type": "string"
+		},
 	},
 	"supports": {
 		"color": {
