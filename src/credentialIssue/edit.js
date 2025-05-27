@@ -49,7 +49,7 @@ import { useEffect } from 'react';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
-	const { openidEndpoint, credentialIssueTemplateKey, authenticationHeaderName, authenticationToken, credentialData } = attributes;
+	const { openidEndpoint, credentialIssueTemplateKey, authenticationHeaderName, authenticationToken, credentialData, formData, sessionData } = attributes;
 
 	return (
 		<>
@@ -97,6 +97,26 @@ export default function Edit( { attributes, setAttributes } ) {
 						value={ credentialData }
 						onChange={ ( value ) =>
 							setAttributes( { credentialData: value } )
+						}
+					/>
+					<TextareaControl
+						label={ __(
+							'Form data',
+							'openid4vc-issue'
+						) }
+						value={ formData }
+						onChange={ ( value ) =>
+							setAttributes( { formData: value } )
+						}
+					/>
+					<TextareaControl
+						label={ __(
+							'Session data',
+							'openid4vc-issue'
+						) }
+						value={ sessionData }
+						onChange={ ( value ) =>
+							setAttributes( { sessionData: value } )
 						}
 					/>
 				</PanelBody>

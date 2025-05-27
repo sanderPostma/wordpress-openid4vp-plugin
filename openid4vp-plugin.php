@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       OpenID4VP
  * Description:       Retrieve verifiable presentations
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires at least: 6.6
  * Requires PHP:      7.2
  * Author:            Credenco
@@ -14,11 +14,11 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+   exit; // Exit if accessed directly.
 }
 
 if ( ! defined( 'OPENID4VP_PLUGIN_URL' ) ) {
-	define( 'OPENID4VP_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
+   define( 'OPENID4VP_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 }
 if (!defined('OPENID4VP_PLUGIN_DIR')) {
     define('OPENID4VP_PLUGIN_DIR', trailingslashit(plugin_dir_path(__FILE__)));
@@ -42,10 +42,10 @@ register_activation_hook(__FILE__, [$openid4vp, 'upgrade']);
  * @see https://developer.wordpress.org/reference/functions/register_block_type/
  */
 function create_block_openid4vp_block_init() {
-	register_block_type( __DIR__ . '/build/presentationExchange' );
-	register_block_type( __DIR__ . '/build/presentationExchangeOrgWallet' );
-	register_block_type( __DIR__ . '/build/presentationAttribute' );
-	register_block_type( __DIR__ . '/build/credentialIssue' );
+   register_block_type( __DIR__ . '/build/presentationExchange' );
+   register_block_type( __DIR__ . '/build/presentationExchangeOrgWallet' );
+   register_block_type( __DIR__ . '/build/presentationAttribute' );
+   register_block_type( __DIR__ . '/build/credentialIssue' );
     if(!session_id()) {
         session_start();
     }
@@ -115,6 +115,7 @@ function ajax_poll_status() {
     if ( isset( $_POST['current'] ) ) {
         $current = $_POST['current'];
     }
+
     $options = new OpenID4VP_Admin_Options();
 
     $response = wp_remote_get( $_SESSION['presentationStatusUri'], array(
@@ -131,7 +132,17 @@ function ajax_poll_status() {
         $successUrl = $_SESSION['successUrl'];
 
         $presentationResponse = json_decode( $body, true);
-        $_SESSION['presentationResponse'] = $presentationResponse;
+        $mainKey = array_keys($presentationResponse);
+        $firstKey = $mainKey[0];
+        if($mainKey && !empty($_SESSION['presentationResponse'])){
+            if (array_key_exists($firstKey, $_SESSION['presentationResponse'])) {
+                $_SESSION['presentationResponse'][$firstKey]['credential'] = $presentationResponse[$firstKey]['credential'];
+            } else {
+               $_SESSION['presentationResponse'] = array_merge($_SESSION['presentationResponse'], $presentationResponse);
+            }
+         } else {
+            $_SESSION['presentationResponse'] = $presentationResponse;
+         }
 
         if ($options->loginUrl == $current) {
             $jsonAttributeNames = explode(".", $options->usernameAttribute);
