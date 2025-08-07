@@ -1,15 +1,4 @@
 <?php
-/**
- * PHP file to use when rendering the block type on the server to show on the front end.
- *
- * The following variables are exposed to the file:
- *     $attributes (array): The block attributes.
- *     $content (string): The block default content.
- *     $block (WP_Block): The block instance.
- *
- * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
- */
-// do a session a start
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -24,12 +13,30 @@ if (!empty($attributes['openidEndpoint'])) {
     $authenticationToken = $attributes['authenticationToken'];
 }
 
-$response = wp_remote_post( $openidEndpoint . '/' . $attributes['presentationDefinitionId'], array(
+$body = array('query_id' => $attributes['queryId']);
+if ($attributes['qrCodeEnabled']) {
+    $qrCode = (object)[];
+    if (array_key_exists('qrSize', $attributes)) {
+        $qrCode->size = $attributes['qrSize'];
+    }
+    if (array_key_exists('qrColorDark', $attributes)) {
+        $qrCode->color_dark = $attributes['qrColorDark'];
+    }
+    if (array_key_exists('qrColorLight', $attributes)) {
+        $qrCode->color_light = $attributes['qrColorLight'];
+    }
+    if (array_key_exists('qrPadding', $attributes)) {
+        $qrCode->padding = $attributes['qrPadding'];
+    }
+    $body['qr_code'] = $qrCode;
+}
+
+$response = wp_remote_post( $openidEndpoint . '/oid4vp/backend/auth/requests', array(
     'headers' => array('Content-Type' => 'application/json', $authenticationHeaderName => $authenticationToken),
     'timeout'     => 45,
     'redirection' => 5,
     'blocking'    => true,
-    'body'        => '{}'
+    'body'        => json_encode($body)
 ));
 
 if (is_wp_error($response)) {
@@ -40,8 +47,8 @@ $body = wp_remote_retrieve_body($response);
 $result = json_decode( $body );
 
 // store the correlation id in the SESSION
-$_SESSION['correlationId'] = $result->correlationId;
-$_SESSION['presentationStatusUri'] = $result->presentationStatusUri;
+$_SESSION['correlationId'] = $result->correlation_id;
+$_SESSION['presentationStatusUri'] = $result->status_uri;
 $_SESSION['authenticationHeaderName'] = $authenticationHeaderName;
 $_SESSION['authenticationToken'] = $authenticationToken;
 if (array_key_exists('successUrl', $attributes)) {
@@ -50,7 +57,7 @@ if (array_key_exists('successUrl', $attributes)) {
 do_action( 'wp_enqueue_script' );
 
 
-$block_content = '<div ' . get_block_wrapper_attributes() . '><img id="openid4vp_qrImage" src="data:' . $result->qrImage . '"></>or click <a href="' . $result->presentationRequestUri . '">link</a></div>';
+$block_content = '<div ' . get_block_wrapper_attributes() . '><img id="openid4vp_qrImage" src="data:' . $result->qr_uri . '"></>or click <a href="' . $result->request_uri . '">link</a></div>';
 
 echo $block_content;
 

@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "openid4vp-plugin/openid4vp-attribute",
 	"version": "0.1.0",
-	"title": "OpenID4VP Attribute",
+	"title": "OID4VP – Display data",
 	"category": "widgets",
 	"description": "Show an attribute from a presentation",
 	"example": {},

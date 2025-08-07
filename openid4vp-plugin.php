@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       OpenID4VP
  * Description:       Retrieve verifiable presentations
- * Version:           0.2.0
+ * Version:           0.3.0
  * Requires at least: 6.6
  * Requires PHP:      7.2
  * Author:            Credenco
@@ -45,7 +45,6 @@ function create_block_openid4vp_block_init() {
    register_block_type( __DIR__ . '/build/presentationExchange' );
    register_block_type( __DIR__ . '/build/presentationExchangeOrgWallet' );
    register_block_type( __DIR__ . '/build/presentationAttribute' );
-   register_block_type( __DIR__ . '/build/credentialIssue' );
     if(!session_id()) {
         session_start();
     }

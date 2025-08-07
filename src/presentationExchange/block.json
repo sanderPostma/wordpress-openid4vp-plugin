@@ -3,9 +3,9 @@
 	"apiVersion": 3,
 	"name": "openid4vp-plugin/openid4vp-exchange",
 	"version": "0.1.0",
-	"title": "OpenID4VP Exchange",
+	"title": "OID4VP - Request data from personal wallet",
 	"category": "widgets",
-	"description": "Start a presentation exchange flow",
+	"description": "Start a presentation exchange flow with the personal wallet",
 	"example": {},
 	"attributes": {
 		"openidEndpoint": {
@@ -17,11 +17,35 @@
 		"authenticationToken": {
 			"type": "string"
 		},
-		"presentationDefinitionId": {
+		"queryId": {
 			"type": "string"
 		},
 		"successUrl": {
 			"type": "string"
+		},
+		"requestUriMethod": {
+			"type": "string"
+		},
+		"clientId": {
+			"type": "string"
+		},
+		"responseMode": {
+			"type": "string"
+		},
+		"qrCodeEnabled": {
+			"type": "boolean"
+		},
+		"qrSize": {
+			"type": "number"
+		},
+		"qrColorDark": {
+			"type": "string"
+		},
+		"qrColorLight": {
+			"type": "string"
+		},
+		"qrPadding": {
+			"type": "number"
 		}
 	},
 	"supports": {

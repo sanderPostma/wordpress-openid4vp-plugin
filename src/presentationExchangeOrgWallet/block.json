@@ -5,7 +5,7 @@
 	"version": "0.1.0",
 	"title": "OID4VP – Request data from organizational wallet",
 	"category": "widgets",
-	"description": "Start a presentation exchange flow",
+	"description": "Start a presentation exchange flow with the organization wallet",
 	"example": {},
 	"attributes": {
 		"openidEndpoint": {
