@@ -19,7 +19,7 @@ import { useBlockProps } from '@wordpress/block-editor';
  * @return {Element} Element to render.
  */
 export default function save( { attributes } ) {
-	const { presentationDefinitionId, openidEndpoint, authenticationHeaderName, authenticationToken } = attributes;
+	const { openidEndpoint } = attributes;
 
 	return <p { ...useBlockProps.save() }>{ openidEndpoint }</p>;
 }

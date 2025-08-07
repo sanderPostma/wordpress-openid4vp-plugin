@@ -17,10 +17,22 @@
 		"authenticationToken": {
 			"type": "string"
 		},
-		"presentationDefinitionId": {
+		"queryId": {
 			"type": "string"
 		},
 		"successUrl": {
+			"type": "string"
+		},
+		"requestUriMethod": {
+			"type": "string"
+		},
+		"clientId": {
+			"type": "string"
+		},
+		"responseType": {
+			"type": "string"
+		},
+		"responseMode": {
 			"type": "string"
 		}
 	},

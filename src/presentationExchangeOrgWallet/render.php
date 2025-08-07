@@ -27,7 +27,7 @@ if (!empty($attributes['openidEndpoint'])) {
 $_SESSION['openidEndpoint'] = $openidEndpoint;
 $_SESSION['authenticationHeaderName'] = $authenticationHeaderName;
 $_SESSION['authenticationToken'] = $authenticationToken;
-$_SESSION['presentationDefinitionId'] = $attributes['presentationDefinitionId'];
+$_SESSION['queryAttributes'] = $attributes;
 
 if (array_key_exists('successUrl', $attributes)) {
     $_SESSION['successUrl'] = wp_sanitize_redirect($attributes['successUrl']);

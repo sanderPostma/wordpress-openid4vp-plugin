@@ -49,7 +49,7 @@ import { useEffect } from 'react';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
-	const { openidEndpoint, authenticationHeaderName, authenticationToken, queryId, requestUriMethod, clientId, responseMode, qrCodeEnabled, qrSize, qrColorDark, qrColorLight, qrPadding, successUrl } = attributes;
+	const { openidEndpoint, authenticationHeaderName, authenticationToken, queryId, requestUriMethod, clientId, responseType, responseMode, qrCodeEnabled, qrSize, qrColorDark, qrColorLight, qrPadding, successUrl } = attributes;
 
 	return (
 		<>
@@ -120,6 +120,16 @@ export default function Edit( { attributes, setAttributes } ) {
 					value={ requestUriMethod }
 					onChange={ ( value ) =>
 						setAttributes( { requestUriMethod: value } )
+					}
+				/>
+				<TextControl
+					label={ __(
+						'Response type',
+						'openid4vp-exchange'
+					) }
+					value={ responseType }
+					onChange={ ( value ) =>
+						setAttributes( { responseType: value } )
 					}
 				/>
 				<TextControl

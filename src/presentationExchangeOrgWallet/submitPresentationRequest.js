@@ -10,10 +10,8 @@
             };
 
             $.post(my_ajax_obj.ajax_url, data, function(response) {
-                console.log(response);
-                console.log(response.presentationRequestUri);
-                if (response && response.presentationRequestUri) {
-                    window.location = response.presentationRequestUri;
+                if (response && response.request_uri) {
+                    window.location = response.request_uri;
                 }
             }, "json");
         });

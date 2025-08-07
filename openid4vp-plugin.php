@@ -198,17 +198,31 @@ function ajax_org_wallet_presentation_exchange() {
     $openidEndpoint = $_SESSION['openidEndpoint'];
     $authenticationHeaderName = $_SESSION['authenticationHeaderName'];
     $authenticationToken = $_SESSION['authenticationToken'];
-    $presentationDefinitionId = $_SESSION['presentationDefinitionId'];
+    $attributes = $_SESSION['queryAttributes'];
 
-   $response = wp_remote_post( $openidEndpoint . '/' . $presentationDefinitionId, array(
+    $body = array('query_id' => $attributes['queryId'], 'request_uri_base' => $walletUrl);
+    if (array_key_exists('requestUriMethod', $attributes)) {
+        $body['request_uri_method'] = $attributes['requestUriMethod'];
+    }
+    if (array_key_exists('clientId', $attributes)) {
+        $body['client_id'] = $attributes['clientId'];
+    }
+    if (array_key_exists('responseType', $attributes)) {
+        $body['response_type'] = $attributes['responseType'];
+    }
+    if (array_key_exists('responseMode', $attributes)) {
+        $body['response_mode'] = $attributes['responseMode'];
+    }
+    if (array_key_exists('successUrl', $attributes)) {
+        $body['direct_post_response_redirect_uri'] = $attributes['successUrl'];
+    }
+
+   $response = wp_remote_post( $openidEndpoint . '/oid4vp/backend/auth/requests', array(
        'headers' => array('Content-Type' => 'application/json', $authenticationHeaderName => $authenticationToken),
        'timeout'     => 45,
        'redirection' => 5,
        'blocking'    => true,
-       'body'        => '{
-         "walletUrl": "' . $walletUrl .'",
-         "successUrl": "' . $_SESSION['successUrl'] . '"
-       }'
+       'body'        => json_encode($body)
    ));
 
    if (is_wp_error($response)) {
@@ -218,10 +232,11 @@ function ajax_org_wallet_presentation_exchange() {
    $body = wp_remote_retrieve_body($response);
    $result = json_decode( $body );
 
-   $_SESSION['correlationId'] = $result->correlationId;
-   $_SESSION['presentationStatusUri'] = $result->presentationStatusUri;
+   $_SESSION['correlationId'] = $result->correlation_id;
+   $_SESSION['presentationStatusUri'] = $result->status_uri;
 
    echo $body;
+
    die();
 }
 

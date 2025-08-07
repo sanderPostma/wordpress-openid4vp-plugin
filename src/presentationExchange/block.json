@@ -29,6 +29,9 @@
 		"clientId": {
 			"type": "string"
 		},
+		"responseType": {
+			"type": "string"
+		},
 		"responseMode": {
 			"type": "string"
 		},
