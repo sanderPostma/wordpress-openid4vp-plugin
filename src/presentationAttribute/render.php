@@ -31,11 +31,18 @@ if (empty($presentationResponse) && !empty($presentationStatusUri)) {
     ));
 
     $body = wp_remote_retrieve_body($response);
-    //$result = json_decode( $body );
+
     $successUrl = null;
     if ( json_decode( $body ) != null ) {
-        $presentationResponse = json_decode( $body, true);
-        $_SESSION['presentationResponse'] = $presentationResponse;
+        $response = json_decode( $body, true);
+        $credentialClaims = $presentationResponse['verified_data']['credential_claims'];
+        foreach ($credentialClaims as $credential) {
+            if (empty($_SESSION['presentationResponse'])) {
+                $_SESSION['presentationResponse'] = (object)[];
+            }
+            $_SESSION['presentationResponse'][$credential['id']] = $credential;
+        }
+        $presentationResponse = isset($_SESSION['presentationResponse']) ? $_SESSION['presentationResponse'] : null;
 
         $_SESSION['authenticationHeaderName'] = null;
         $_SESSION['authenticationToken'] = null;
@@ -47,8 +54,8 @@ if (!empty($presentationResponse) && isset($attributes['attributeName'])) {
     $jsonAttributeNames = explode(".", $attributes['attributeName']);
 
     // Check if the credential type exists in the presentation response
-    if (isset($attributes['credentialType']) && isset($presentationResponse[$attributes['credentialType']])) {
-        $result = $presentationResponse[$attributes['credentialType']];
+    if (isset($attributes['credentialQueryId']) && isset($presentationResponse[$attributes['credentialQueryId']])) {
+        $result = $presentationResponse[$attributes['credentialQueryId']];
         foreach ($jsonAttributeNames as &$name) {
             // Check if the attribute exists before accessing it
             if (isset($result[$name])) {

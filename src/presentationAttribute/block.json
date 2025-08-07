@@ -8,7 +8,7 @@
 	"description": "Show an attribute from a presentation",
 	"example": {},
 	"attributes": {
-		"credentialType": {
+		"credentialQueryId": {
 			"type": "string"
 		},
 		"attributeLabel": {

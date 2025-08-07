@@ -131,22 +131,21 @@ function ajax_poll_status() {
         $successUrl = $_SESSION['successUrl'];
 
         $presentationResponse = json_decode( $body, true);
-        $mainKey = array_keys($presentationResponse);
-        $firstKey = $mainKey[0];
-        if($mainKey && !empty($_SESSION['presentationResponse'])){
-            if (array_key_exists($firstKey, $_SESSION['presentationResponse'])) {
-                $_SESSION['presentationResponse'][$firstKey]['credential'] = $presentationResponse[$firstKey]['credential'];
-            } else {
-               $_SESSION['presentationResponse'] = array_merge($_SESSION['presentationResponse'], $presentationResponse);
+
+        error_log($body);
+
+        $credentialClaims = $presentationResponse['verified_data']['credential_claims'];
+        foreach ($credentialClaims as $credential) {
+            if (empty($_SESSION['presentationResponse'])) {
+                $_SESSION['presentationResponse'] = (object)[];
             }
-         } else {
-            $_SESSION['presentationResponse'] = $presentationResponse;
-         }
+            $_SESSION['presentationResponse'][$credential['id']] = $credential;
+        }
 
         if ($options->loginUrl == $current) {
             $jsonAttributeNames = explode(".", $options->usernameAttribute);
 
-            $result = $presentationResponse;
+            $result = $_SESSION['presentationResponse'];
             foreach ($jsonAttributeNames as &$name) {
                 $result = $result[$name];
             }
