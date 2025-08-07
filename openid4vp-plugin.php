@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       OpenID4VP
+ * Plugin Name:       Universal OID4VP
  * Description:       Retrieve verifiable presentations
  * Version:           0.3.0
  * Requires at least: 6.6

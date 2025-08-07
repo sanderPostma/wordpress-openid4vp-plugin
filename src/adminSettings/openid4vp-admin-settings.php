@@ -39,17 +39,17 @@ class OpenID4VP_Admin_Settings {
     }
 
     public function add_page() {
-        add_options_page('OpenID4VP', 'OpenID4VP', 'manage_options', 'openid4vp_settings', [$this, 'create_settings_page']);
+        add_options_page('Universal OID4VP', 'Universal OID4VP', 'manage_options', 'openid4vp_settings', [$this, 'create_settings_page']);
     }
 
     public function create_settings_page() {
         ?>
         <div class="openid4vp-login-settings container-fluid">
             <div class="admin-settings-header">
-                <h1>OpenID4VP Settings</h1>
+                <h1>Universal OID4VP Settings</h1>
             </div>
             <div class="admin-settings-inside">
-                <p>This plugin is provides the OpenID4VP flow both to login and to request information from users</p>
+                <p>This plugin is provides the Universal OID4VP flow both to login and to request information from users</p>
                 <div id="accordion">
                     <h3 id="sso-configuration">Configuration</h3>
                     <div class="row">
