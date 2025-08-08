@@ -137,7 +137,7 @@ function ajax_poll_status() {
         $credentialClaims = $presentationResponse['verified_data']['credential_claims'];
         foreach ($credentialClaims as $credential) {
             if (empty($_SESSION['presentationResponse'])) {
-                $_SESSION['presentationResponse'] = (object)[];
+                $_SESSION['presentationResponse'] = [];
             }
             $_SESSION['presentationResponse'][$credential['id']] = $credential;
         }
