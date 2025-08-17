@@ -17,7 +17,8 @@ if (session_status() === PHP_SESSION_NONE) {
 // Retrieve the presentation response
 $presentationResponse = isset($_SESSION['presentationResponse']) ? $_SESSION['presentationResponse'] : null;
 $presentationStatusUri = isset($_SESSION['presentationStatusUri']) ? $_SESSION['presentationStatusUri'] : null;
-if (empty($presentationResponse) && !empty($presentationStatusUri)) {
+
+if (!empty($_SESSION['successUrl']) && !empty($presentationStatusUri)) {
     $headers = array('Content-Type' => 'application/json');
     if (isset($_SESSION['authenticationHeaderName']) && isset($_SESSION['authenticationToken'])) {
         $headers[$_SESSION['authenticationHeaderName']] = $_SESSION['authenticationToken'];
@@ -35,10 +36,10 @@ if (empty($presentationResponse) && !empty($presentationStatusUri)) {
     $successUrl = null;
     if ( json_decode( $body ) != null ) {
         $response = json_decode( $body, true);
-        $credentialClaims = $presentationResponse['verified_data']['credential_claims'];
+        $credentialClaims = $response['verified_data']['credential_claims'];
         foreach ($credentialClaims as $credential) {
             if (empty($_SESSION['presentationResponse'])) {
-                $_SESSION['presentationResponse'] = (object)[];
+                $_SESSION['presentationResponse'] = [];
             }
             $_SESSION['presentationResponse'][$credential['id']] = $credential;
         }

@@ -14,7 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$options = new OpenID4VP_Admin_Options();
+$options = new Universal_OpenID4VP_Admin_Options();
 $openidEndpoint = $options->openidEndpoint;
 $authenticationHeaderName = $options->authenticationHeaderName;
 $authenticationToken = $options->authenticationToken;
@@ -32,10 +32,12 @@ $_SESSION['queryAttributes'] = $attributes;
 if (array_key_exists('successUrl', $attributes)) {
     $_SESSION['successUrl'] = wp_sanitize_redirect($attributes['successUrl']);
 }
-do_action( 'wp_enqueue_script' );
+
+do_action( 'submitPresentationRequest' );
+
 
 // Add JavaScript to handle the form submission
-enqueue_org_wallet_scripts('jquery');
+universal_openid4vp_enqueue_org_wallet_scripts('jquery');
 
 $block_content = '<div ' . get_block_wrapper_attributes() . '>
     <form id="org-wallet-form">

@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "openid4vp-plugin/openid4vp-exchange-org-wallet",
+	"name": "universal-openid4vp-plugin/openid4vp-exchange-org-wallet",
 	"version": "0.1.0",
 	"title": "OID4VP – Request data from organizational wallet",
 	"category": "widgets",

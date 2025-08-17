@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "openid4vp-plugin/openid4vp-exchange",
+	"name": "universal-openid4vp-plugin/openid4vp-exchange",
 	"version": "0.1.0",
 	"title": "OID4VP - Request data from personal wallet",
 	"category": "widgets",
@@ -66,5 +66,6 @@
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",
 	"render": "file:./render.php",
-	"viewScript": "file:./pollStatus.js"
+	"viewScript": "file:./pollStatus.js",
+	"script": "file:./dummy.js"
 }

@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$options = new OpenID4VP_Admin_Options();
+$options = new Universal_OpenID4VP_Admin_Options();
 $openidEndpoint = $options->openidEndpoint;
 $authenticationHeaderName = $options->authenticationHeaderName;
 $authenticationToken = $options->authenticationToken;
@@ -57,7 +57,8 @@ if (array_key_exists('successUrl', $attributes)) {
 do_action( 'wp_enqueue_script' );
 
 
-$block_content = '<div ' . get_block_wrapper_attributes() . '><img id="openid4vp_qrImage" src="data:' . $result->qr_uri . '"></>or click <a href="' . $result->request_uri . '">link</a></div>';
+$qr_content = $attributes['qrCodeEnabled'] ? '<img id="openid4vp_qrImage" src="data:' . $result->qr_uri . '"></>or ' : '';
+$block_content = '<div ' . get_block_wrapper_attributes() . '>' . $qr_content . 'click <a href="' . $result->request_uri . '">link</a></div>';
 
 echo $block_content;
 

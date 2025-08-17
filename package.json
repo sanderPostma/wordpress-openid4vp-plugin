@@ -1,5 +1,5 @@
 {
-	"name": "openid4vp-plugin",
+	"name": "universal-openid4vp-plugin",
 	"version": "0.3.0",
 	"description": "Display your site's copyright date.",
 	"author": "Credenco B.V.",
@@ -15,9 +15,6 @@
 		"start": "wp-scripts start --webpack-copy-php",
 		"env": "wp-env"
 	},
-	"files": [
-		"*"
-	],
 	"devDependencies": {
 		"@wordpress/env": "^10.27.0",
 		"@wordpress/scripts": "^30.20.0"

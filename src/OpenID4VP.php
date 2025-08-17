@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-class OpenID4VP {
+class Universal_OpenID4VP {
     public $version = '1.0.0';
 
     public static $_instance = null;
@@ -30,15 +30,15 @@ class OpenID4VP {
     }
 
     public static function includes() {
-        require_once(OPENID4VP_PLUGIN_DIR . 'build/adminSettings/openid4vp-admin-options.php');
-        require_once(OPENID4VP_PLUGIN_DIR . 'build/adminSettings/openid4vp-admin-settings.php');
+        require_once(UNIVERSAL_OPENID4VP_PLUGIN_DIR . 'build/adminSettings/openid4vp-admin-options.php');
+        require_once(UNIVERSAL_OPENID4VP_PLUGIN_DIR . 'build/adminSettings/openid4vp-admin-settings.php');
     }
 
     public function setup() {
-        $admin_options = get_option('openid4vp_options');
+        $admin_options = get_option('universal_openid4vp_options');
 
         if (!isset($admin_options['openidEndpoint'])) {
-            update_option('openid4vp_options', $this->default_settings);
+            update_option('universal_openid4vp_options', $this->default_settings);
         }
 
         $this->install();

@@ -3,8 +3,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-class OpenID4VP_Admin_Options {
-    const OPTION_NAME = 'openid4vp_options';
+class Universal_OpenID4VP_Admin_Options {
+    const OPTION_NAME = 'universal_openid4vp_options';
 
     private $option_values;
 

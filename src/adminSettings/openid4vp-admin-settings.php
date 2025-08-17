@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-class OpenID4VP_Admin_Settings {
+class Universal_OpenID4VP_Admin_Settings {
     private $admin_options;
 
     private $option_name;
@@ -19,12 +19,12 @@ class OpenID4VP_Admin_Settings {
         'redirectUserOrigin'
     );
 
-    public function __construct(OpenID4VP_Admin_Options $admin_options) {
+    public function __construct(Universal_OpenID4VP_Admin_Options $admin_options) {
         $this->admin_options = $admin_options;
         $this->option_name = $this->admin_options->get_option_name();
     }
 
-    public static function init(OpenID4VP_Admin_Options $admin_options) {
+    public static function init(Universal_OpenID4VP_Admin_Options $admin_options) {
         $admin_settings = new self($admin_options);
         add_action('admin_init', [$admin_settings, 'admin_init']);
         add_action('admin_menu', [$admin_settings, 'add_page']);
@@ -35,14 +35,14 @@ class OpenID4VP_Admin_Settings {
     }
 
     public function admin_init() {
-        register_setting('openid4vp_options', $this->option_name, [$this, 'validate']);
+        register_setting('universal_openid4vp_options', $this->option_name, [$this, 'validate']);
     }
 
     public function add_page() {
-        add_options_page('Universal OID4VP', 'Universal OID4VP', 'manage_options', 'openid4vp_settings', [$this, 'create_settings_page']);
+        add_options_page('Universal OID4VP', 'Universal OID4VP', 'manage_options', 'universal_openid4vp_settings', [$this, 'universal_openid4vp_create_settings_page']);
     }
 
-    public function create_settings_page() {
+    public function universal_openid4vp_create_settings_page() {
         ?>
         <div class="openid4vp-login-settings container-fluid">
             <div class="admin-settings-header">
@@ -54,7 +54,7 @@ class OpenID4VP_Admin_Settings {
                     <h3 id="sso-configuration">Configuration</h3>
                     <div class="row">
                         <form method="post" action="options.php">
-                            <?php settings_fields('openid4vp_options'); ?>
+                            <?php settings_fields('universal_openid4vp_options'); ?>
                             <table class="form-table">
                                 <tr valign="top">
                                     <th scope="row">OpenID4VP Endpoint</th>
@@ -105,7 +105,7 @@ class OpenID4VP_Admin_Settings {
                     </div>
                     <hr />
                     <p class="submit">
-                        <input type="submit" class="button-primary" value="<?php esc_html_e('Save Changes', 'openid4vp-plugin') ?>"/>
+                        <input type="submit" class="button-primary" value="<?php esc_html_e('Save Changes', 'universal-openid4vp-plugin') ?>"/>
                     </p>
                     </form>
                 </div>
@@ -131,4 +131,4 @@ class OpenID4VP_Admin_Settings {
     }
 }
 
-OpenID4VP_Admin_Settings::init(new OpenID4VP_Admin_Options());
+Universal_OpenID4VP_Admin_Settings::init(new Universal_OpenID4VP_Admin_Options());
