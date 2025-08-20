@@ -36,7 +36,8 @@
 			"type": "string"
 		},
 		"qrCodeEnabled": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": true
 		},
 		"qrSize": {
 			"type": "number"

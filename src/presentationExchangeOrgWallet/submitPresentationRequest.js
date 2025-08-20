@@ -5,7 +5,7 @@
             var walletUrl = $("#org-wallet-url").val();
 
             var data = {
-                action: "presentation_exchange_ajax",
+                action: "universal_openid4vp_presentation_exchange_ajax",
                 walletUrl: walletUrl
             };
 

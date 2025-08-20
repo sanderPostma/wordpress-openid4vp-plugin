@@ -16,16 +16,16 @@ if (!empty($attributes['openidEndpoint'])) {
 $body = array('query_id' => $attributes['queryId']);
 if ($attributes['qrCodeEnabled']) {
     $qrCode = (object)[];
-    if (array_key_exists('qrSize', $attributes)) {
+    if (array_key_exists('qrSize', $attributes) && !empty($attributes['qrSize'])) {
         $qrCode->size = $attributes['qrSize'];
     }
-    if (array_key_exists('qrColorDark', $attributes)) {
+    if (array_key_exists('qrColorDark', $attributes) && !empty($attributes['qrColorDark'])) {
         $qrCode->color_dark = $attributes['qrColorDark'];
     }
-    if (array_key_exists('qrColorLight', $attributes)) {
+    if (array_key_exists('qrColorLight', $attributes) && !empty($attributes['qrColorLight'])) {
         $qrCode->color_light = $attributes['qrColorLight'];
     }
-    if (array_key_exists('qrPadding', $attributes)) {
+    if (array_key_exists('qrPadding', $attributes) && !empty($attributes['qrPadding'])) {
         $qrCode->padding = $attributes['qrPadding'];
     }
     $body['qr_code'] = $qrCode;

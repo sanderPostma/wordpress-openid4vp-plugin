@@ -103,11 +103,11 @@ add_action('login_message', 'universal_openid4vp_login_form_button');
 // Add an action to call our script enqueuing function
 add_action( 'wp_enqueue_script', 'universal_openid4vp_enqueue_personal_wallet_scripts' );
 
-add_action( 'wp_ajax_nopriv_poll_status_ajax', 'universal_openid4vp_ajax_poll_status' );
-add_action( 'wp_ajax_poll_status_ajax', 'universal_openid4vp_ajax_poll_status' );
+add_action( 'wp_ajax_nopriv_universal_openid4vp_poll_status_ajax', 'universal_openid4vp_ajax_poll_status' );
+add_action( 'wp_ajax_universal_openid4vp_poll_status_ajax', 'universal_openid4vp_ajax_poll_status' );
 
-add_action( 'wp_ajax_nopriv_presentation_exchange_ajax', 'universal_openid4vp_ajax_org_wallet_presentation_exchange');
-add_action( 'wp_ajax_presentation_exchange_ajax', 'universal_openid4vp_ajax_org_wallet_presentation_exchange');
+add_action( 'wp_ajax_nopriv_universal_openid4vp_presentation_exchange_ajax', 'universal_openid4vp_ajax_org_wallet_presentation_exchange');
+add_action( 'wp_ajax_universal_openid4vp_presentation_exchange_ajax', 'universal_openid4vp_ajax_org_wallet_presentation_exchange');
 
 /**
  * Gets the number of votes from the database, and sends it
