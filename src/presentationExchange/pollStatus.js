@@ -26,7 +26,7 @@
         // Anything else is data that we want to pass to the PHP function.
         // Here, I am adding the text of the #votes element
         var data = {
-            action: "poll_status_ajax",
+            action: "universal_openid4vp_poll_status_ajax",
             current: window.location.href
         };
         // Send a POST request to the ajaxurl (WordPress variable), using the data

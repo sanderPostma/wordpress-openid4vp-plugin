@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#inspectorcontrols
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps, InspectorAdvancedControls } from '@wordpress/block-editor';
 
 /**
  * Imports the necessary components that will be used to create
@@ -26,7 +26,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
  * @see https://developer.wordpress.org/block-editor/reference-guides/components/text-control/
  * @see https://developer.wordpress.org/block-editor/reference-guides/components/toggle-control/
  */
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, TextControl } from '@wordpress/components';
 
 /**
  * Imports the useEffect React Hook. This is used to set an attribute when the
@@ -49,7 +49,7 @@ import { useEffect } from 'react';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
-	const { openidEndpoint, presentationDefinitionId, authenticationHeaderName, authenticationToken, successUrl } = attributes;
+	const { openidEndpoint, queryId, authenticationHeaderName, authenticationToken, successUrl, requestUriMethod, clientId, responseType, responseMode } = attributes;
 
 	return (
 		<>
@@ -57,36 +57,12 @@ export default function Edit( { attributes, setAttributes } ) {
 				<PanelBody title={ __( 'Settings', 'openid4vp-exchange' ) }>
 					<TextControl
 						label={ __(
-							'OpenID4VP Endpoint',
+							'Query id',
 							'openid4vp-exchange'
 						) }
-						value={ openidEndpoint }
+						value={ queryId }
 						onChange={ ( value ) =>
-							setAttributes( { openidEndpoint: value } )
-						}
-					/>
-					<TextControl
-						label="Authentication header"
-						value={authenticationHeaderName}
-						onChange={( value ) =>
-							setAttributes( { authenticationHeaderName: value } )
-						}
-					/>
-					<TextControl
-						label="Authentication token"
-						value={authenticationToken}
-						onChange={( value ) =>
-							setAttributes( { authenticationToken: value } )
-						}
-					/>
-					<TextControl
-						label={ __(
-							'Presentation definition id',
-							'openid4vp-exchange'
-						) }
-						value={ presentationDefinitionId }
-						onChange={ ( value ) =>
-							setAttributes( { presentationDefinitionId: value } )
+							setAttributes( { queryId: value } )
 						}
 					/>
 					<TextControl
@@ -101,6 +77,72 @@ export default function Edit( { attributes, setAttributes } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<InspectorAdvancedControls>
+				<TextControl
+					label={ __(
+						'OpenID4VP Endpoint',
+						'openid4vp-exchange'
+					) }
+					value={ openidEndpoint }
+					onChange={ ( value ) =>
+						setAttributes( { openidEndpoint: value } )
+					}
+				/>
+				<TextControl
+					label="Authentication header"
+					value={authenticationHeaderName}
+					onChange={( value ) =>
+						setAttributes( { authenticationHeaderName: value } )
+					}
+				/>
+				<TextControl
+					label="Authentication token"
+					value={authenticationToken}
+					onChange={( value ) =>
+						setAttributes( { authenticationToken: value } )
+					}
+				/>
+				<TextControl
+					label={ __(
+						'Client id',
+						'openid4vp-exchange'
+					) }
+					value={ clientId }
+					onChange={ ( value ) =>
+						setAttributes( { clientId: value } )
+					}
+				/>
+				<TextControl
+					label={ __(
+						'Request URI method',
+						'openid4vp-exchange'
+					) }
+					value={ requestUriMethod }
+					onChange={ ( value ) =>
+						setAttributes( { requestUriMethod: value } )
+					}
+				/>
+				<TextControl
+					label={ __(
+						'Response type',
+						'openid4vp-exchange'
+					) }
+					value={ responseType }
+					onChange={ ( value ) =>
+						setAttributes( { responseType: value } )
+					}
+				/>
+				<TextControl
+					label={ __(
+						'Response mode',
+						'openid4vp-exchange'
+					) }
+					value={ responseMode }
+					onChange={ ( value ) =>
+						setAttributes( { responseMode: value } )
+					}
+				/>
+			</InspectorAdvancedControls>
 			<p {...useBlockProps()}>
 				<form id="org-wallet-form">
 					<input type="text" id="org-wallet-url" name="walletUrl" placeholder="Enter wallet URL" />

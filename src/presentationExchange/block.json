@@ -1,11 +1,11 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "openid4vp-plugin/openid4vp-exchange",
+	"name": "universal-openid4vp-plugin/openid4vp-exchange",
 	"version": "0.1.0",
-	"title": "OpenID4VP Exchange",
+	"title": "OID4VP - Request data from personal wallet",
 	"category": "widgets",
-	"description": "Start a presentation exchange flow",
+	"description": "Start a presentation exchange flow with the personal wallet",
 	"example": {},
 	"attributes": {
 		"openidEndpoint": {
@@ -17,11 +17,39 @@
 		"authenticationToken": {
 			"type": "string"
 		},
-		"presentationDefinitionId": {
+		"queryId": {
 			"type": "string"
 		},
 		"successUrl": {
 			"type": "string"
+		},
+		"requestUriMethod": {
+			"type": "string"
+		},
+		"clientId": {
+			"type": "string"
+		},
+		"responseType": {
+			"type": "string"
+		},
+		"responseMode": {
+			"type": "string"
+		},
+		"qrCodeEnabled": {
+			"type": "boolean",
+			"default": true
+		},
+		"qrSize": {
+			"type": "number"
+		},
+		"qrColorDark": {
+			"type": "string"
+		},
+		"qrColorLight": {
+			"type": "string"
+		},
+		"qrPadding": {
+			"type": "number"
 		}
 	},
 	"supports": {
@@ -39,5 +67,6 @@
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",
 	"render": "file:./render.php",
-	"viewScript": "file:./pollStatus.js"
+	"viewScript": "file:./pollStatus.js",
+	"script": "file:./dummy.js"
 }

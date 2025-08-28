@@ -5,15 +5,13 @@
             var walletUrl = $("#org-wallet-url").val();
 
             var data = {
-                action: "presentation_exchange_ajax",
+                action: "universal_openid4vp_presentation_exchange_ajax",
                 walletUrl: walletUrl
             };
 
             $.post(my_ajax_obj.ajax_url, data, function(response) {
-                console.log(response);
-                console.log(response.presentationRequestUri);
-                if (response && response.presentationRequestUri) {
-                    window.location = response.presentationRequestUri;
+                if (response && response.request_uri) {
+                    window.location = response.request_uri;
                 }
             }, "json");
         });

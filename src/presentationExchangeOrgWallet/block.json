@@ -1,11 +1,11 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "openid4vp-plugin/openid4vp-exchange-org-wallet",
+	"name": "universal-openid4vp-plugin/openid4vp-exchange-org-wallet",
 	"version": "0.1.0",
 	"title": "OID4VP – Request data from organizational wallet",
 	"category": "widgets",
-	"description": "Start a presentation exchange flow",
+	"description": "Start a presentation exchange flow with the organization wallet",
 	"example": {},
 	"attributes": {
 		"openidEndpoint": {
@@ -17,10 +17,22 @@
 		"authenticationToken": {
 			"type": "string"
 		},
-		"presentationDefinitionId": {
+		"queryId": {
 			"type": "string"
 		},
 		"successUrl": {
+			"type": "string"
+		},
+		"requestUriMethod": {
+			"type": "string"
+		},
+		"clientId": {
+			"type": "string"
+		},
+		"responseType": {
+			"type": "string"
+		},
+		"responseMode": {
 			"type": "string"
 		}
 	},

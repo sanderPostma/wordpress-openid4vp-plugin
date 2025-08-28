@@ -49,7 +49,7 @@ import { useEffect } from 'react';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
-	const { credentialType, attributeLabel, attributeName } = attributes;
+	const { credentialQueryId, attributeLabel, attributeName } = attributes;
 
 	return (
 		<>
@@ -57,12 +57,12 @@ export default function Edit( { attributes, setAttributes } ) {
 				<PanelBody title={__('Settings', 'openid4vp-attribute')}>
 					<TextControl
 						label={ __(
-							'Credential Type',
+							'Credential query id',
 							'openid4vp-attribute'
 						) }
-						value={ credentialType }
+						value={ credentialQueryId }
 						onChange={ ( value ) =>
-							setAttributes( { credentialType: value } )
+							setAttributes( { credentialQueryId: value } )
 						}
 					/>
 					<TextControl
