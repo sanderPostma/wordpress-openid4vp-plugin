@@ -49,7 +49,7 @@ import { useEffect } from 'react';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
-	const { openidEndpoint, queryId, authenticationHeaderName, authenticationToken, successUrl, requestUriMethod, clientId, responseType, responseMode } = attributes;
+	const { openidEndpoint, tokenEndpoint, apiClientId, apiClientSecret, queryId, successUrl, requestUriMethod, clientId, responseType, responseMode } = attributes;
 
 	return (
 		<>
@@ -89,17 +89,24 @@ export default function Edit( { attributes, setAttributes } ) {
 					}
 				/>
 				<TextControl
-					label="Authentication header"
-					value={authenticationHeaderName}
+					label="Token endpoint"
+					value={tokenEndpoint}
 					onChange={( value ) =>
-						setAttributes( { authenticationHeaderName: value } )
+						setAttributes( { tokenEndpoint: value } )
 					}
 				/>
 				<TextControl
-					label="Authentication token"
-					value={authenticationToken}
+					label="API client id"
+					value={apiClientId}
 					onChange={( value ) =>
-						setAttributes( { authenticationToken: value } )
+						setAttributes( { apiClientId: value } )
+					}
+				/>
+				<TextControl
+					label="API client secret"
+					value={apiClientSecret}
+					onChange={( value ) =>
+						setAttributes( { apiClientSecret: value } )
 					}
 				/>
 				<TextControl

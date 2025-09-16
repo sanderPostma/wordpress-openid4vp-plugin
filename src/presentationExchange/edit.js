@@ -49,7 +49,7 @@ import { useEffect } from 'react';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
-	const { openidEndpoint, authenticationHeaderName, authenticationToken, queryId, requestUriMethod, clientId, responseType, responseMode, qrCodeEnabled, qrSize, qrColorDark, qrColorLight, qrPadding, successUrl } = attributes;
+	const { openidEndpoint, tokenEndpoint, apiClientId, apiClientSecret, queryId, clientId, requestUriMethod, responseType, responseMode, qrCodeEnabled, qrSize, qrColorDark, qrColorLight, qrPadding, successUrl } = attributes;
 
 	return (
 		<>
@@ -89,17 +89,24 @@ export default function Edit( { attributes, setAttributes } ) {
 					}
 				/>
 				<TextControl
-					label="Authentication header"
-					value={authenticationHeaderName}
+					label="Token endpoint"
+					value={tokenEndpoint}
 					onChange={( value ) =>
-						setAttributes( { authenticationHeaderName: value } )
+						setAttributes( { tokenEndpoint: value } )
 					}
 				/>
 				<TextControl
-					label="Authentication token"
-					value={authenticationToken}
+					label="API client id"
+					value={apiClientId}
 					onChange={( value ) =>
-						setAttributes( { authenticationToken: value } )
+						setAttributes( { apiClientId: value } )
+					}
+				/>
+				<TextControl
+					label="API client secret"
+					value={apiClientSecret}
+					onChange={( value ) =>
+						setAttributes( { apiClientSecret: value } )
 					}
 				/>
 				<TextControl

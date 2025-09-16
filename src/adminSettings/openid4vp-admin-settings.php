@@ -12,8 +12,9 @@ class Universal_OpenID4VP_Admin_Settings {
 
     private $admin_settings_fields = array(
         'openidEndpoint',
-        'authenticationHeaderName',
-        'authenticationToken',
+        'tokenEndpoint',
+        'apiClientId',
+        'apiClientSecret',
         'loginUrl',
         'usernameAttribute',
         'redirectUserOrigin'
@@ -65,17 +66,25 @@ class Universal_OpenID4VP_Admin_Settings {
                                     </td>
                                 </tr>
                                 <tr valign="top">
-                                    <th scope="row">Authentication header</th>
+                                    <th scope="row">Token Endpoint</th>
                                     <td>
-                                        <input type="text" class="regular-text" name="<?php echo esc_html($this->option_name); ?>[authenticationHeaderName]" min="10"
-                                            value="<?php echo esc_html($this->admin_options->authenticationHeaderName); ?>"/>
+                                        <input type="text" class="regular-text" name="<?php echo esc_html($this->option_name); ?>[tokenEndpoint]" min="10"
+                                            value="<?php echo esc_html($this->admin_options->tokenEndpoint); ?>"/>
+                                        <p class="description">Example: https://iam.acc.credenco.com/realms/organization-wallet/protocol/openid-connect/token</p>
                                     </td>
                                 </tr>
                                 <tr valign="top">
-                                    <th scope="row">Authentication token</th>
+                                    <th scope="row">API client id</th>
                                     <td>
-                                        <input type="text" class="regular-text" name="<?php echo esc_html($this->option_name); ?>[authenticationToken]" min="10"
-                                            value="<?php echo esc_html($this->admin_options->authenticationToken); ?>"/>
+                                        <input type="text" class="regular-text" name="<?php echo esc_html($this->option_name); ?>[apiClientId]" min="10"
+                                            value="<?php echo esc_html($this->admin_options->apiClientId); ?>"/>
+                                    </td>
+                                </tr>
+                                <tr valign="top">
+                                    <th scope="row">API client secret</th>
+                                    <td>
+                                        <input type="text" class="regular-text" name="<?php echo esc_html($this->option_name); ?>[apiClientSecret]" min="10"
+                                            value="<?php echo esc_html($this->admin_options->apiClientSecret); ?>"/>
                                     </td>
                                 </tr>
                                 <tr valign="top">

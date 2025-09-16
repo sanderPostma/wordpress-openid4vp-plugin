@@ -20,8 +20,8 @@ $presentationStatusUri = isset($_SESSION['presentationStatusUri']) ? $_SESSION['
 
 if (!empty($_SESSION['successUrl']) && !empty($presentationStatusUri)) {
     $headers = array('Content-Type' => 'application/json');
-    if (isset($_SESSION['authenticationHeaderName']) && isset($_SESSION['authenticationToken'])) {
-        $headers[$_SESSION['authenticationHeaderName']] = $_SESSION['authenticationToken'];
+    if (isset($_SESSION['accessToken'])) {
+        $headers['Authorization'] = 'Bearer ' . $_SESSION['accessToken'];
     }
 
     $response = wp_remote_get( $presentationStatusUri, array(
@@ -32,6 +32,8 @@ if (!empty($_SESSION['successUrl']) && !empty($presentationStatusUri)) {
     ));
 
     $body = wp_remote_retrieve_body($response);
+
+    error_log('Result: '. $body);
 
     $successUrl = null;
     if ( json_decode( $body ) != null ) {
@@ -45,8 +47,7 @@ if (!empty($_SESSION['successUrl']) && !empty($presentationStatusUri)) {
         }
         $presentationResponse = isset($_SESSION['presentationResponse']) ? $_SESSION['presentationResponse'] : null;
 
-        $_SESSION['authenticationHeaderName'] = null;
-        $_SESSION['authenticationToken'] = null;
+        $_SESSION['accessToken'] = null;
         $_SESSION['successUrl'] = null;
     }
 }

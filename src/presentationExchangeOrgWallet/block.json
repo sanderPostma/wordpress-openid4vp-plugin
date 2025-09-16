@@ -11,10 +11,13 @@
 		"openidEndpoint": {
 			"type": "string"
 		},
-		"authenticationHeaderName": {
+		"tokenEndpoint": {
 			"type": "string"
 		},
-		"authenticationToken": {
+		"apiClientId": {
+			"type": "string"
+		},
+		"apiClientSecret": {
 			"type": "string"
 		},
 		"queryId": {

@@ -122,7 +122,7 @@ function universal_openid4vp_ajax_poll_status() {
     $options = new Universal_OpenID4VP_Admin_Options();
 
     $response = wp_remote_get( $_SESSION['presentationStatusUri'], array(
-        'headers' => array('Content-Type' => 'application/json', $_SESSION['authenticationHeaderName'] => $_SESSION['authenticationToken'] ),
+        'headers' => array('Content-Type' => 'application/json', 'Authorization' => 'Bearer ' . $_SESSION['accessToken'] ),
         'timeout'     => 45,
         'redirection' => 5,
         'blocking'    => true
@@ -173,8 +173,7 @@ function universal_openid4vp_ajax_poll_status() {
             }
         }
 
-        $_SESSION['authenticationHeaderName'] = null;
-        $_SESSION['authenticationToken'] = null;
+        $_SESSION['accessToken'] = null;
         $_SESSION['successUrl'] = null;
     }
 
@@ -195,16 +194,57 @@ function universal_openid4vp_ajax_poll_status() {
  * back to the client script as JSON.
  */
 function universal_openid4vp_ajax_org_wallet_presentation_exchange() {
-    // Get the 'walletUrl' data that the AJAX call sent
-    if ( isset( $_POST['walletUrl'] ) ) {
-        $walletUrl = $_POST['walletUrl'];
-    }
-    $openidEndpoint = $_SESSION['openidEndpoint'];
-    $authenticationHeaderName = $_SESSION['authenticationHeaderName'];
-    $authenticationToken = $_SESSION['authenticationToken'];
-    $attributes = $_SESSION['queryAttributes'];
+   $attributes = $_SESSION['queryAttributes'];
 
-    $body = array('query_id' => $attributes['queryId'], 'request_uri_base' => $walletUrl);
+   $response = universal_openid4vp_sendVpRequest($attributes);
+
+   if ($response["success"] === false) {
+      echo $response["error"];
+      return;
+   }
+
+   echo json_encode($response["result"]);
+
+   die();
+}
+
+function universal_openid4vp_sendVpRequest($attributes) {
+    $options = new Universal_OpenID4VP_Admin_Options();
+    $openidEndpoint = $options->openidEndpoint;
+    $tokenEndpoint = $options->tokenEndpoint;
+    $apiClientId = $options->apiClientId;
+    $apiClientSecret = $options->apiClientSecret;
+    if (!empty($attributes['openidEndpoint'])) {
+        $openidEndpoint = $attributes['openidEndpoint'];
+        $tokenEndpoint = $attributes['tokenEndpoint'];
+        $apiClientId = $attributes['apiClientId'];
+        $apiClientSecret = $attributes['apiClientSecret'];
+    }
+
+    $tokenRequest = array(
+        'grant_type' => 'client_credentials',
+        'client_id' => $apiClientId,
+        'client_secret' => $apiClientSecret
+    );
+
+    $response = wp_remote_post( $tokenEndpoint, array(
+        'headers' => array('Content-Type' => 'application/x-www-form-urlencoded'),
+        'timeout'     => 45,
+        'redirection' => 5,
+        'blocking'    => true,
+        'body'        => $tokenRequest
+    ));
+
+    if (is_wp_error($response)) {
+        $block_content = '<div ' . get_block_wrapper_attributes() . '><p>Error getting client access token</p></div>';
+        return ["success" => false, "error" => $block_content];
+    }
+    $authenticationResult = json_decode( wp_remote_retrieve_body($response) );
+
+    $body = array('query_id' => $attributes['queryId']);
+    if ( isset( $_POST['walletUrl'] ) ) {
+        $body['request_uri_base'] = $_POST['walletUrl'];
+    }
     if (array_key_exists('requestUriMethod', $attributes)) {
         $body['request_uri_method'] = $attributes['requestUriMethod'];
     }
@@ -220,26 +260,57 @@ function universal_openid4vp_ajax_org_wallet_presentation_exchange() {
     if (array_key_exists('successUrl', $attributes)) {
         $body['direct_post_response_redirect_uri'] = $attributes['successUrl'];
     }
+    if (isset($attributes['qrCodeEnabled']) && $attributes['qrCodeEnabled']) {
+        $qrCode = (object)[];
+        if (array_key_exists('qrSize', $attributes) && !empty($attributes['qrSize'])) {
+            $qrCode->size = $attributes['qrSize'];
+        }
+        if (array_key_exists('qrColorDark', $attributes) && !empty($attributes['qrColorDark'])) {
+            $qrCode->color_dark = $attributes['qrColorDark'];
+        }
+        if (array_key_exists('qrColorLight', $attributes) && !empty($attributes['qrColorLight'])) {
+            $qrCode->color_light = $attributes['qrColorLight'];
+        }
+        if (array_key_exists('qrPadding', $attributes) && !empty($attributes['qrPadding'])) {
+            $qrCode->padding = $attributes['qrPadding'];
+        }
+        $body['qr_code'] = $qrCode;
+    }
 
-   $response = wp_remote_post( $openidEndpoint . '/oid4vp/backend/auth/requests', array(
-       'headers' => array('Content-Type' => 'application/json', $authenticationHeaderName => $authenticationToken),
-       'timeout'     => 45,
-       'redirection' => 5,
-       'blocking'    => true,
-       'body'        => json_encode($body)
-   ));
+    $response = wp_remote_post( $openidEndpoint . '/oid4vp/backend/auth/requests', array(
+        'headers' => array('Content-Type' => 'application/json', 'Authorization' => 'Bearer ' . $authenticationResult->access_token),
+        'timeout'     => 45,
+        'redirection' => 5,
+        'blocking'    => true,
+        'body'        => json_encode($body)
+    ));
 
-   if (is_wp_error($response)) {
-       return 'Error fetching data';
-   }
+    if (is_wp_error($response)) {
+        $block_content = '<div ' . get_block_wrapper_attributes() . '><p>Error fetching data</p></div>';
+        return ["success" => false, "error" => $block_content];
+    }
 
-   $body = wp_remote_retrieve_body($response);
-   $result = json_decode( $body );
+    $body = wp_remote_retrieve_body($response);
+    $result = json_decode( $body );
 
-   $_SESSION['correlationId'] = $result->correlation_id;
-   $_SESSION['presentationStatusUri'] = $result->status_uri;
+    if ( json_last_error() !== JSON_ERROR_NONE ) {
+        $block_content = '<div ' . get_block_wrapper_attributes() . '><p>JSON decode fout: ' . json_last_error_msg().'</p></div>';
+        return ["success" => false, "error" => $block_content];
+    }
 
-   echo $body;
+    // Controleer op fout in de API response zelf (bijv. foutcode of foutbericht)
+    if ( isset( $result->status ) && isset( $result->detail ) ) {
+        $block_content = '<div ' . get_block_wrapper_attributes() . '><p>API fout: ' . $result->detail.'</p></div>';
+        return ["success" => false, "error" => $block_content];
+    }
 
-   die();
+    // store the correlation id in the SESSION
+    $_SESSION['correlationId'] = $result->correlation_id;
+    $_SESSION['presentationStatusUri'] = $result->status_uri;
+    $_SESSION['accessToken'] = $authenticationResult->access_token;
+    if (array_key_exists('successUrl', $attributes)) {
+        $_SESSION['successUrl'] = wp_sanitize_redirect($attributes['successUrl']);
+    }
+
+   return ["success" => true, "result" => $result];
 }
