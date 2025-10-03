@@ -13,12 +13,12 @@
  * @package           create-block
  */
 
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+   exit; // Exit if accessed directly.
 }
 
-if (!defined('UNIVERSAL_OPENID4VP_PLUGIN_URL')) {
-    define('UNIVERSAL_OPENID4VP_PLUGIN_URL', untrailingslashit(plugin_dir_url(__FILE__)));
+if ( ! defined( 'UNIVERSAL_OPENID4VP_PLUGIN_URL' ) ) {
+   define( 'UNIVERSAL_OPENID4VP_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 }
 if (!defined('UNIVERSAL_OPENID4VP_PLUGIN_DIR')) {
     define('UNIVERSAL_OPENID4VP_PLUGIN_DIR', trailingslashit(plugin_dir_path(__FILE__)));
@@ -146,10 +146,10 @@ function universal_openid4vp_ajax_poll_status() {
             $presentationData = [];
             foreach ($credentialClaims as $credential) {
                 $presentationData[$credential['id']] = $credential;
-                error_log('OID4VP: Stored credential with ID: ' . $credential['id']);
+                uo_debug_log('Stored credential with ID: ' . $credential['id']);
             }
             set_transient('oid4vp_presentation_' . $correlationId, $presentationData, 600);
-            error_log('OID4VP: Stored presentation data in transient for correlation_id=' . $correlationId);
+            uo_debug_log('Stored presentation data in transient for correlation_id=' . $correlationId);
 
             // Get successUrl and append correlation_id
             $successUrl = get_transient('oid4vp_success_url_' . $correlationId);
@@ -157,7 +157,7 @@ function universal_openid4vp_ajax_poll_status() {
             if ($successUrl) {
                 // Append correlation_id to URL
                 $successUrl = add_query_arg('oid4vp_cid', $correlationId, $successUrl);
-                error_log('OID4VP: Redirecting to ' . $successUrl);
+                uo_debug_log('Redirecting to ' . $successUrl);
                 delete_transient('oid4vp_success_url_' . $correlationId);
             }
 
@@ -195,13 +195,15 @@ function universal_openid4vp_ajax_poll_status() {
 
     // Prepare the data to sent back to Javascript
     $data = array(
-        'presentationStatusUri' => $_SESSION['presentationStatusUri'],
-        'configuredSuccessUrl' => $successUrl,
+        'presentationStatusUri'    =>    $_SESSION['presentationStatusUri'],
+        'configuredSuccessUrl' => $_SESSION['successUrl'],
         'successUrl' => $successUrl
     );
 
     // Encode it as JSON and send it back
-    error_log('OID4VP: Response data: ' . json_encode($data));
+    if (defined('WP_DEBUG') && WP_DEBUG) { // (Do not json_encode when not logging)
+        uo_debug_log('Response data: ' . json_encode($data));
+    }
     echo json_encode($data);
     die();
 }
@@ -348,7 +350,7 @@ function universal_openid4vp_sendVpRequest($attributes) {
     // Store successUrl in transient using correlation_id as key (for cross-device flow)
     if (array_key_exists('successUrl', $attributes) && !$isMobile) {
         set_transient('oid4vp_success_url_' . $result->correlation_id, wp_sanitize_redirect($attributes['successUrl']), 600);
-        error_log('OID4VP: Stored successUrl in transient for correlation_id=' . $result->correlation_id);
+        uo_debug_log('Stored successUrl in transient for correlation_id=' . $result->correlation_id);
     }
 
     return ["success" => true, "result" => $result];
