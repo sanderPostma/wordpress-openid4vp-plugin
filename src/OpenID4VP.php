@@ -64,14 +64,3 @@ class Universal_OpenID4VP {
     }
 }
 
-/**
- * Log debug message only when WP_DEBUG is enabled
- *
- * @param string $message The message to log
- */
-function uo_debug_log($message) {
-    if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('OID4VP: ' . $message);
-    }
-}
-

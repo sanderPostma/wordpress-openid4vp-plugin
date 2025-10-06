@@ -24,12 +24,24 @@ if (!defined('UNIVERSAL_OPENID4VP_PLUGIN_DIR')) {
     define('UNIVERSAL_OPENID4VP_PLUGIN_DIR', trailingslashit(plugin_dir_path(__FILE__)));
 }
 
+/**
+ * Log debug message only when WP_DEBUG is enabled
+ *
+ * @param string $message The message to log
+ */
+function uo_debug_log($message) {
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('OID4VP: ' . $message);
+    }
+}
+
 require_once(UNIVERSAL_OPENID4VP_PLUGIN_DIR . 'build/OpenID4VP.php');
 
 $openid4vp = new Universal_OpenID4VP();
 
 add_action('admin_menu', [$openid4vp, 'plugin_init']);
 add_action('wp_logout', [$openid4vp, 'logout']);
+add_action('template_redirect', 'universal_openid4vp_handle_wallet_redirect');
 
 register_activation_hook(__FILE__, [$openid4vp, 'setup']);
 register_activation_hook(__FILE__, [$openid4vp, 'upgrade']);
@@ -148,7 +160,7 @@ function universal_openid4vp_ajax_poll_status() {
                 $presentationData[$credential['id']] = $credential;
                 uo_debug_log('Stored credential with ID: ' . $credential['id']);
             }
-            set_transient('oid4vp_presentation_' . $correlationId, $presentationData, 600);
+            set_transient('oid4vp_presentation_' . $correlationId, $presentationData, 600); // FIXME 10 minute lifecycle is fine for demos, not for prod
             uo_debug_log('Stored presentation data in transient for correlation_id=' . $correlationId);
 
             // Get successUrl and append correlation_id
@@ -289,15 +301,6 @@ function universal_openid4vp_sendVpRequest($attributes) {
         $body['response_mode'] = $attributes['responseMode'];
     }
 
-    // **HANDLE SUCCESS URL BASED ON FLOW TYPE**
-    if (array_key_exists('successUrl', $attributes)) {
-        if ($isMobile) {
-            // Same-device: wallet redirects
-            $body['direct_post_response_redirect_uri'] = $attributes['successUrl'];
-        }
-        // Note: We'll store successUrl in transient after we get correlation_id
-    }
-
     if (isset($attributes['qrCodeEnabled']) && $attributes['qrCodeEnabled']) {
         $qrCode = (object)[];
         if (array_key_exists('qrSize', $attributes) && !empty($attributes['qrSize'])) {
@@ -313,6 +316,13 @@ function universal_openid4vp_sendVpRequest($attributes) {
             $qrCode->padding = $attributes['qrPadding'];
         }
         $body['qr_code'] = $qrCode;
+    }
+
+    // Set mobile redirect URI before making the API call
+    if (array_key_exists('successUrl', $attributes) && $isMobile) {
+        $redirectUrl = add_query_arg('oid4vp_mobile_redirect', '1', home_url('/'));
+        $body['direct_post_response_redirect_uri'] = $redirectUrl;
+        uo_debug_log('Same-device flow: direct_post_response_redirect_uri=' . $redirectUrl);
     }
 
     $response = wp_remote_post( $openidEndpoint . '/oid4vp/backend/auth/requests', array(
@@ -347,11 +357,54 @@ function universal_openid4vp_sendVpRequest($attributes) {
     $_SESSION['presentationStatusUri'] = $result->status_uri;
     $_SESSION['accessToken'] = $authenticationResult->access_token;
 
-    // Store successUrl in transient using correlation_id as key (for cross-device flow)
-    if (array_key_exists('successUrl', $attributes) && !$isMobile) {
-        set_transient('oid4vp_success_url_' . $result->correlation_id, wp_sanitize_redirect($attributes['successUrl']), 600);
-        uo_debug_log('Stored successUrl in transient for correlation_id=' . $result->correlation_id);
+    if (array_key_exists('successUrl', $attributes)) {
+        $_SESSION['successUrl'] = wp_sanitize_redirect($attributes['successUrl']);
+    }
+
+    // Store redirect data based on flow type
+    if (array_key_exists('successUrl', $attributes)) {
+        if ($isMobile) {
+            // Same-device: Store correlation_id with success URL for wallet redirect
+            set_transient('oid4vp_redirect_' . $result->correlation_id, wp_sanitize_redirect($attributes['successUrl']), 600);
+            uo_debug_log('Same-device flow: stored redirect data for correlation_id=' . $result->correlation_id);
+        } else {
+            // Cross-device flow: Store success URL for polling to use
+            set_transient('oid4vp_success_url_' . $result->correlation_id, wp_sanitize_redirect($attributes['successUrl']), 600);
+            uo_debug_log('Cross-device flow: stored successUrl for correlation_id=' . $result->correlation_id);
+        }
     }
 
     return ["success" => true, "result" => $result];
+}
+
+
+/**
+ * Handle wallet redirect in same-device flow
+ */
+function universal_openid4vp_handle_wallet_redirect() {
+    if (!isset($_GET['oid4vp_mobile_redirect'])) {
+        return;
+    }
+
+    if (!session_id()) {
+        session_start();
+    }
+
+    // Get correlation_id from session
+    $correlationId = isset($_SESSION['correlationId']) ? $_SESSION['correlationId'] : null;
+    $successUrl = isset($_SESSION['successUrl']) ? $_SESSION['successUrl'] : null;
+
+    uo_debug_log('Wallet redirect handler: correlation_id=' . ($correlationId ?: 'NULL') . ', successUrl=' . ($successUrl ?: 'NULL'));
+
+    if (!$correlationId || !$successUrl) {
+        wp_die('Invalid or expired redirect link');
+        return;
+    }
+
+    // Redirect to success URL with correlation_id
+    $redirectUrl = add_query_arg('oid4vp_cid', $correlationId, $successUrl);
+    uo_debug_log('Redirecting to: ' . $redirectUrl);
+
+    wp_redirect($redirectUrl);
+    exit;
 }
